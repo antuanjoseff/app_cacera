@@ -1,8 +1,7 @@
 from django.contrib.gis import admin
 from django.contrib.gis.forms.widgets import OSMWidget
 from batudes.models import Coto, Sector, Batuda
-from django.urls import reverse_lazy
-from django import forms
+from batudes.forms import BatudaAdminForm, SectorAdminForm
 
 class CustomGeoWidget(OSMWidget):
     template_name = 'gis/custom_openlayers.html'
@@ -24,7 +23,8 @@ class CotoAdmin(CustomGeoModelAdmin):
 
 @admin.register(Sector)
 class SectorAdmin(CustomGeoModelAdmin):
-  
+    form = SectorAdminForm
+
     def get_model_perms(self, request):
         if (not Coto.objects.count()):
             return {}
@@ -38,30 +38,11 @@ class SectorAdmin(CustomGeoModelAdmin):
         
     pass
 
-class BatudaAdminForm(forms.ModelForm):
-    class Meta:
-        exclude = ['user',]
-        model = Batuda        
-        htmx_attrs = {
-            "hx-get": reverse_lazy("get_sectors"),
-            "hx-swap": "innerHTML",
-            "hx-trigger": "load,change",
-            "hx-target": "#id_sectors",
-        }
-
-        fields = "__all__"
-        widgets = {
-            "coto": forms.Select(attrs=htmx_attrs),
-        }
-
-
-
 @admin.register(Batuda)
 class BatudaAdmin(admin.ModelAdmin):
     form = BatudaAdminForm
 
     def save_model(self, request, obj, form, change):
-        print('hola mundo ' + request.user.username)
         obj.user = request.user
         super().save_model(request, obj, form, change)
 

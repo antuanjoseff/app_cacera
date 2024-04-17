@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
 from batudes.models import Coto, Sector
+from django.http import HttpResponse
 
 # Create your views here.
 def index():
@@ -19,3 +20,9 @@ class get_sectors(ListView):
             else:
                 return Sector.objects.filter(coto__id=coto_id).all()
         return Sector.objects.none()
+    
+def get_coto_bbox(coto_id):
+    # name = Coto.objects.filter(pk=coto_id)
+    
+    return HttpResponse('hola mundo')
+   
