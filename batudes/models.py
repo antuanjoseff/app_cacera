@@ -9,7 +9,8 @@ def get_default_coto_status():
 class Coto(models.Model):
     short_code = models.CharField(max_length=5, unique=True, null=True)
     name = models.CharField(max_length=255)
-    geom = models.MultiPolygonField(null=True)
+    geom = models.MultiPolygonField()
+    bbox = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.name

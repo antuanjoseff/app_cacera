@@ -1,10 +1,11 @@
 from django.contrib.gis import admin
-from django.contrib.gis.forms.widgets import OSMWidget
+from django.forms import Form, HiddenInput, CharField, ChoiceField, ModelForm
 from batudes.models import Coto, Sector, Batuda
-from batudes.forms import BatudaAdminForm, SectorAdminForm
+from batudes.forms import BatudaAdminForm, SectorAdminForm, CotoAdminForm, CustomGeoWidget
+from django.contrib.gis.db.models import Extent
+from shapely.geometry import Polygon
+import shapely.wkt
 
-class CustomGeoWidget(OSMWidget):
-    template_name = 'gis/custom_openlayers.html'
 
 class CustomGeoModelAdmin(admin.GISModelAdmin):
     gis_widget = CustomGeoWidget
@@ -19,12 +20,24 @@ class CustomGeoModelAdmin(admin.GISModelAdmin):
 
 @admin.register(Coto)
 class CotoAdmin(CustomGeoModelAdmin):
+    form = CotoAdminForm
+
+    def save_model(self, request, obj, form, change):
+        # qs = Coto.objects.filter(short_code=obj.short_code).aggregate(Extent("geom"))
+        # obj.bbox = obj.geom.Extent
+        geom_arr = str(obj.geom).split(';')
+        P = shapely.wkt.loads(geom_arr[1])
+        obj.bbox = P.bounds
+
+        super().save_model(request, obj, form, change)    
+
     pass
 
 @admin.register(Sector)
 class SectorAdmin(CustomGeoModelAdmin):
     form = SectorAdminForm
 
+    
     def get_model_perms(self, request):
         if (not Coto.objects.count()):
             return {}

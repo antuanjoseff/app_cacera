@@ -123,6 +123,14 @@ class MapWidget {
         this.ready = true;
     }
 
+    fitToExtent(ext){
+        var arr = [ext[0], ext[1], ext[2], ext[3]]
+        var padding = [50, 50, 50, 50]
+        ext = ol.proj.transformExtent(arr, ol.proj.get('EPSG:4326'), ol.proj.get('EPSG:3857'));
+        console.log(ext)
+        this.map.getView().fit(ext, {size: this.map.getSize(), padding});
+    }
+
     createMap() {
         return new ol.Map({
             target: this.options.map_id,

@@ -21,8 +21,14 @@ class get_sectors(ListView):
                 return Sector.objects.filter(coto__id=coto_id).all()
         return Sector.objects.none()
     
-def get_coto_bbox(coto_id):
-    # name = Coto.objects.filter(pk=coto_id)
-    
-    return HttpResponse('hola mundo')
+def get_coto_bbox(request):
+    coto_id = request.GET.get('coto', '')
+    bbox = Coto.objects.filter(pk=coto_id).values_list('bbox').first()
+
+    return HttpResponse("""
+        <input type="text" name="bbox" required="" id="id_bbox" value="{}">
+        <script>
+           changeMapView()
+        </script>
+    """.format(bbox))
    
